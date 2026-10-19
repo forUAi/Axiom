@@ -1,0 +1,85 @@
+{
+  "version": "1.1",
+  "name": "Axiom EMS adapter",
+  "transport": "HTTPS + bearer token supplied by the user",
+  "events": {
+    "method": "GET",
+    "path": "/v1/events",
+    "query": {
+      "source": "Zenity,Troj",
+      "limit": 6
+    },
+    "response": {
+      "events": [
+        {
+          "id": "ZNT-1042",
+          "source": "Zenity",
+          "title": "External sharing detected",
+          "description": "Event details and audit facts",
+          "severity": "high",
+          "occurred_at": "2026-10-19T07:42:00Z",
+          "attributes": {},
+          "analyst_label": "TP",
+          "reference_explanation": "Analyst-confirmed explanation (optional)",
+          "contexts": [
+            {
+              "id": "POL-014",
+              "title": "Sharing policy",
+              "text": "Original context text",
+              "score": 0.94
+            }
+          ],
+          "decision": {
+            "verdict": "TP",
+            "confidence": 0.91,
+            "rationale": "Original model rationale",
+            "cited_context_ids": [
+              "POL-014"
+            ],
+            "insufficient_evidence": false,
+            "model": "your-production-model"
+          },
+          "relevant_context_ids": [
+            "POL-014",
+            "AUD-042"
+          ]
+        }
+      ],
+      "next_cursor": null
+    }
+  },
+  "retrieve": {
+    "method": "POST",
+    "path": "/v1/retrieve",
+    "body": {
+      "event_id": "ZNT-1042",
+      "query": "Title + description",
+      "top_k": 5
+    },
+    "response": {
+      "contexts": [
+        {
+          "id": "POL-014",
+          "title": "Sharing policy",
+          "text": "Retrieved evidence text",
+          "score": 0.94
+        }
+      ]
+    }
+  },
+  "rules": [
+    "analyst_label may be TP, FP, or null.",
+    "reference_explanation is optional and used only for evaluation.",
+    "contexts and decision are optional unless evaluating existing EMS decisions.",
+    "Each source must be Zenity or Troj. Event and context IDs must be unique.",
+    "Return contexts in retrieval rank order, with at most top_k items.",
+    "The classifier never receives the analyst_label or reference_explanation fields.",
+    "The workspace evaluates one batch of at most 50 events per run; next_cursor is reserved for the adapter.",
+    "Allow CORS from the Axiom site origin; allow Content-Type and Authorization headers.",
+    "The workspace does not write labels or remediation actions back to EMS.",
+    "relevant_context_ids is optional. When supplied it must be the complete analyst-curated set of relevant chunk IDs, including relevant chunks not retrieved. Omit the field when relevance is unknown.",
+    "Precision@k uses relevant top-k hits / requested k. Missing returned positions count as misses. Recall@k uses hits / the complete relevant set; empty sets have undefined recall.",
+    "Existing EMS decisions use their original retrieved-context count as k.",
+    "relevant_context_ids is used for evaluation only and never sent to the classifier."
+  ]
+}
